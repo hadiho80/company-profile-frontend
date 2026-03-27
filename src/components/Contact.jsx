@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API_URL from "../config";
 import axios from "axios";
 
 function Contact() {
@@ -56,7 +57,7 @@ function Contact() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:3001/api/contacts", form);
+      await axios.post(`${API_URL}/api/contacts`, form);
       setStatus({ type: "success", message: "✅ Pesan berhasil dikirim!" });
       setForm({ nama: "", email: "", telepon: "", pesan: "" });
       setErrors({});

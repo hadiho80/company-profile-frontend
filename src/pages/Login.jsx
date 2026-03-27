@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config";
 import axios from "axios";
 
 function Login() {
@@ -32,10 +33,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/auth/login",
-        form,
-      );
+      const response = await axios.post(`${API_URL}/api/auth/login`, form);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("admin", JSON.stringify(response.data.admin));
       navigate("/admin/dashboard");

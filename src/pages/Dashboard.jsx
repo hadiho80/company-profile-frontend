@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config";
 import axios from "axios";
 
 function Dashboard() {
@@ -26,7 +27,7 @@ function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3001/api/contacts", {
+      const response = await axios.get(`${API_URL}/api/contacts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContacts(response.data);
@@ -41,7 +42,7 @@ function Dashboard() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3001/api/contacts/${id}`, {
+      await axios.delete(`${API_URL}/api/contacts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContacts(contacts.filter((c) => c.id !== id));
