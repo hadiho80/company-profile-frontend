@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import API_URL from "../config";
+import toast from "react-hot-toast";
 
 function Contact() {
   const [form, setForm] = useState({
@@ -10,7 +11,6 @@ function Contact() {
     pesan: "",
   });
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -35,7 +35,6 @@ function Contact() {
   };
 
   const handleSubmit = async () => {
-    setStatus(null);
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -44,14 +43,11 @@ function Contact() {
     setLoading(true);
     try {
       await axios.post(`${API_URL}/api/contacts`, form);
-      setStatus({ type: "success", message: "✅ Pesan berhasil dikirim!" });
+      toast.success("Pesan berhasil dikirim!");
       setForm({ nama: "", email: "", telepon: "", pesan: "" });
       setErrors({});
     } catch {
-      setStatus({
-        type: "error",
-        message: "❌ Gagal mengirim pesan, coba lagi.",
-      });
+      toast.error("Gagal mengirim pesan, coba lagi.");
     }
     setLoading(false);
   };

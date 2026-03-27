@@ -7,6 +7,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import BackToTop from "./components/BackToTop";
 
 function Home() {
   return (
@@ -17,6 +18,7 @@ function Home() {
       <Services />
       <Contact />
       <Footer />
+      <BackToTop />
     </div>
   );
 }

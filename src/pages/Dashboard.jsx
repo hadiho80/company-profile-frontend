@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../config";
+import TableSkeleton from "../components/Skeleton";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -135,6 +136,43 @@ function Dashboard() {
           </button>
         </div>
 
+        {/* Stats */}
+        {!loading && !error && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-dark-100 rounded-xl p-5 border border-gray-800">
+              <p className="text-gray-500 text-xs mb-1">Total Pesan</p>
+              <p className="text-3xl font-bold text-white">{contacts.length}</p>
+            </div>
+            <div className="bg-dark-100 rounded-xl p-5 border border-gray-800">
+              <p className="text-gray-500 text-xs mb-1">Hari Ini</p>
+              <p className="text-3xl font-bold text-primary">
+                {
+                  contacts.filter((c) => {
+                    const today = new Date().toDateString();
+                    return new Date(c.created_at).toDateString() === today;
+                  }).length
+                }
+              </p>
+            </div>
+            <div className="bg-dark-100 rounded-xl p-5 border border-gray-800">
+              <p className="text-gray-500 text-xs mb-1">Minggu Ini</p>
+              <p className="text-3xl font-bold text-white">
+                {
+                  contacts.filter((c) => {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    return new Date(c.created_at) >= weekAgo;
+                  }).length
+                }
+              </p>
+            </div>
+            <div className="bg-dark-100 rounded-xl p-5 border border-gray-800">
+              <p className="text-gray-500 text-xs mb-1">Hasil Pencarian</p>
+              <p className="text-3xl font-bold text-white">{filtered.length}</p>
+            </div>
+          </div>
+        )}
+
         {/* Toolbar */}
         <div className="flex flex-wrap gap-4 items-center mb-6">
           <input
@@ -162,11 +200,7 @@ function Dashboard() {
         </div>
 
         {/* States */}
-        {loading && (
-          <div className="text-center py-20 text-gray-500">
-            ⏳ Memuat data...
-          </div>
-        )}
+        {loading && <TableSkeleton />}
         {error && (
           <div className="text-center py-20 text-primary">❌ {error}</div>
         )}

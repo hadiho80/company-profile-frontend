@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const aboutData = [
   {
     icon: "🏢",
@@ -26,7 +28,14 @@ function About() {
         <h2 className="section-title">Tentang Kami</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {aboutData.map((item, index) => (
-            <div key={index} className="card text-center">
+            <motion.div
+              key={index}
+              className="card text-center"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              viewport={{ once: true }}
+            >
               <span className="text-5xl block mb-4">{item.icon}</span>
               <h3 className="text-xl font-bold text-white mb-3">
                 {item.title}
@@ -34,7 +43,7 @@ function About() {
               <p className="text-gray-400 leading-relaxed">
                 {item.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
