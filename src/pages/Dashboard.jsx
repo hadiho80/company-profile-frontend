@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import toast from "react-hot-toast";
 import API_URL from "../config";
 import TableSkeleton from "../components/Skeleton";
+import EditModal from "../components/EditModal";
+import ContactChart from "../components/ContactChart";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -11,8 +16,10 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState(null);
+  const [editContact, setEditContact] = useState(null);
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showChart, setShowChart] = useState(false);
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
 
   useEffect(() => {
@@ -48,9 +55,70 @@ function Dashboard() {
       });
       setContacts(contacts.filter((c) => c.id !== id));
       setDeleteId(null);
+      toast.success("Data berhasil dihapus!");
     } catch {
-      alert("Gagal menghapus data");
+      toast.error("Gagal menghapus data");
     }
+  };
+
+  const handleEdit = async (id, form) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${API_URL}/api/contacts/${id}`, form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setContacts(contacts.map((c) => (c.id === id ? { ...c, ...form } : c)));
+      setEditContact(null);
+      toast.success("Data berhasil diupdate!");
+    } catch {
+      toast.error("Gagal mengupdate data");
+    }
+  };
+
+  const handleExportExcel = () => {
+    const data = filtered.map((c, i) => ({
+      No: i + 1,
+      Nama: c.nama,
+      Email: c.email,
+      Telepon: c.telepon || "-",
+      Pesan: c.pesan,
+      Tanggal: formatDate(c.created_at),
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Contacts");
+
+    // Auto width kolom
+    const colWidths = [
+      { wch: 5 },
+      { wch: 25 },
+      { wch: 30 },
+      { wch: 18 },
+      { wch: 50 },
+      { wch: 22 },
+    ];
+    ws["!cols"] = colWidths;
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, `data-contacts-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast.success("Data berhasil diexport!");
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["No", "Nama", "Email", "Telepon", "Pesan", "Tanggal"];
+    const rows = filtered.map((c, i) => [
+      i + 1,
+      c.nama,
+      c.email,
+      c.telepon || "-",
+      `"${c.pesan}"`,
+      formatDate(c.created_at),
+    ]);
+    const csvContent = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, `data-contacts-${new Date().toISOString().slice(0, 10)}.csv`);
+    toast.success("CSV berhasil diexport!");
   };
 
   const handleLogout = () => {
@@ -128,12 +196,32 @@ function Dashboard() {
               Menampilkan {paginated.length} dari {filtered.length} pesan
             </p>
           </div>
-          <button
-            className="border border-primary text-primary px-4 py-2 rounded-lg text-sm hover:bg-primary hover:text-white transition-all duration-200"
-            onClick={fetchContacts}
-          >
-            🔄 Refresh
-          </button>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              className="border border-gray-600 text-gray-400 px-4 py-2 rounded-lg text-sm hover:border-primary hover:text-primary transition-all duration-200"
+              onClick={() => setShowChart(!showChart)}
+            >
+              {showChart ? "📊 Sembunyikan Chart" : "📊 Lihat Chart"}
+            </button>
+            <button
+              className="border border-green-700 text-green-400 px-4 py-2 rounded-lg text-sm hover:bg-green-800 hover:text-white transition-all duration-200"
+              onClick={handleExportExcel}
+            >
+              📥 Export Excel
+            </button>
+            <button
+              className="border border-blue-700 text-blue-400 px-4 py-2 rounded-lg text-sm hover:bg-blue-800 hover:text-white transition-all duration-200"
+              onClick={handleExportCSV}
+            >
+              📄 Export CSV
+            </button>
+            <button
+              className="border border-primary text-primary px-4 py-2 rounded-lg text-sm hover:bg-primary hover:text-white transition-all duration-200"
+              onClick={fetchContacts}
+            >
+              🔄 Refresh
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -147,10 +235,11 @@ function Dashboard() {
               <p className="text-gray-500 text-xs mb-1">Hari Ini</p>
               <p className="text-3xl font-bold text-primary">
                 {
-                  contacts.filter((c) => {
-                    const today = new Date().toDateString();
-                    return new Date(c.created_at).toDateString() === today;
-                  }).length
+                  contacts.filter(
+                    (c) =>
+                      new Date(c.created_at).toDateString() ===
+                      new Date().toDateString(),
+                  ).length
                 }
               </p>
             </div>
@@ -172,6 +261,9 @@ function Dashboard() {
             </div>
           </div>
         )}
+
+        {/* Chart */}
+        {showChart && !loading && <ContactChart contacts={contacts} />}
 
         {/* Toolbar */}
         <div className="flex flex-wrap gap-4 items-center mb-6">
@@ -199,40 +291,33 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* States */}
         {loading && <TableSkeleton />}
         {error && (
           <div className="text-center py-20 text-primary">❌ {error}</div>
         )}
 
-        {/* Table */}
         {!loading && !error && (
           <>
             <div className="overflow-x-auto rounded-xl shadow-lg border border-gray-800 mb-6">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-dark-300">
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      No
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      Nama
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      Email
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      Telepon
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold">
-                      Pesan
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      Tanggal
-                    </th>
-                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
-                      Aksi
-                    </th>
+                    {[
+                      "No",
+                      "Nama",
+                      "Email",
+                      "Telepon",
+                      "Pesan",
+                      "Tanggal",
+                      "Aksi",
+                    ].map((h) => (
+                      <th
+                        key={h}
+                        className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap"
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -272,12 +357,20 @@ function Dashboard() {
                           {formatDate(contact.created_at)}
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            className="bg-red-900/40 text-red-400 border border-red-800 px-3 py-1.5 rounded-lg text-xs hover:bg-red-800 hover:text-white transition-all duration-200 whitespace-nowrap"
-                            onClick={() => setDeleteId(contact.id)}
-                          >
-                            🗑️ Hapus
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              className="bg-blue-900/40 text-blue-400 border border-blue-800 px-3 py-1.5 rounded-lg text-xs hover:bg-blue-800 hover:text-white transition-all duration-200 whitespace-nowrap"
+                              onClick={() => setEditContact(contact)}
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              className="bg-red-900/40 text-red-400 border border-red-800 px-3 py-1.5 rounded-lg text-xs hover:bg-red-800 hover:text-white transition-all duration-200 whitespace-nowrap"
+                              onClick={() => setDeleteId(contact.id)}
+                            >
+                              🗑️ Hapus
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -296,7 +389,6 @@ function Dashboard() {
                 >
                   ← Prev
                 </button>
-
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
                     <button
@@ -308,7 +400,6 @@ function Dashboard() {
                     </button>
                   ),
                 )}
-
                 <button
                   className="px-4 py-2 rounded-lg bg-dark-300 text-gray-400 text-sm hover:bg-dark-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   onClick={() =>
@@ -323,6 +414,15 @@ function Dashboard() {
           </>
         )}
       </div>
+
+      {/* Modal Edit */}
+      {editContact && (
+        <EditModal
+          contact={editContact}
+          onClose={() => setEditContact(null)}
+          onSave={handleEdit}
+        />
+      )}
 
       {/* Modal Hapus */}
       {deleteId && (
