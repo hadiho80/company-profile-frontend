@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API_URL from "../config";
 import axios from "axios";
+import API_URL from "../config";
 
 function Login() {
   const navigate = useNavigate();
@@ -30,7 +30,6 @@ function Login() {
       setErrors(newErrors);
       return;
     }
-
     setLoading(true);
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, form);
@@ -48,24 +47,30 @@ function Login() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <div style={styles.header}>
-          <h1 style={styles.logo}>MyCompany</h1>
-          <h2 style={styles.title}>Admin Panel</h2>
-          <p style={styles.subtitle}>Masuk untuk mengelola data</p>
+    <div className="min-h-screen bg-dark-400 flex items-center justify-center px-6">
+      <div className="w-full max-w-md bg-dark-100 rounded-2xl p-10 shadow-2xl border border-gray-800">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary mb-2">MyCompany</h1>
+          <h2 className="text-xl font-semibold text-white mb-1">Admin Panel</h2>
+          <p className="text-gray-500 text-sm">Masuk untuk mengelola data</p>
         </div>
 
-        {status && <div style={styles.alert}>❌ {status}</div>}
+        {/* Alert */}
+        {status && (
+          <div className="bg-red-900/50 border border-red-700 text-red-400 px-4 py-3 rounded-lg text-sm text-center mb-6">
+            ❌ {status}
+          </div>
+        )}
 
-        <div style={styles.form}>
+        {/* Form */}
+        <div className="flex flex-col gap-5">
           <div>
-            <label style={styles.label}>Username</label>
+            <label className="block text-gray-400 text-sm font-semibold mb-2">
+              Username
+            </label>
             <input
-              style={{
-                ...styles.input,
-                borderColor: errors.username ? "#e94560" : "#2a2a4a",
-              }}
+              className={`input-field ${errors.username ? "border-primary" : ""}`}
               type="text"
               name="username"
               placeholder="Masukkan username"
@@ -75,19 +80,17 @@ function Login() {
               autoFocus
             />
             {errors.username && (
-              <p style={styles.errorText}>⚠️ {errors.username}</p>
+              <p className="text-primary text-xs mt-1">⚠️ {errors.username}</p>
             )}
           </div>
 
           <div>
-            <label style={styles.label}>Password</label>
-            <div style={styles.passwordWrapper}>
+            <label className="block text-gray-400 text-sm font-semibold mb-2">
+              Password
+            </label>
+            <div className="relative">
               <input
-                style={{
-                  ...styles.input,
-                  borderColor: errors.password ? "#e94560" : "#2a2a4a",
-                  paddingRight: "48px",
-                }}
+                className={`input-field pr-12 ${errors.password ? "border-primary" : ""}`}
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Masukkan password"
@@ -96,7 +99,7 @@ function Login() {
                 onKeyDown={handleKeyDown}
               />
               <button
-                style={styles.eyeButton}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
                 type="button"
               >
@@ -104,23 +107,22 @@ function Login() {
               </button>
             </div>
             {errors.password && (
-              <p style={styles.errorText}>⚠️ {errors.password}</p>
+              <p className="text-primary text-xs mt-1">⚠️ {errors.password}</p>
             )}
           </div>
 
           <button
-            style={{
-              ...styles.button,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
+            className={`btn-primary w-full mt-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
             onClick={handleSubmit}
             disabled={loading}
           >
             {loading ? "⏳ Memproses..." : "🔐 Login"}
           </button>
 
-          <a href="/" style={styles.backLink}>
+          <a
+            href="/"
+            className="text-gray-500 hover:text-primary text-sm text-center transition-colors"
+          >
             ← Kembali ke Halaman Utama
           </a>
         </div>
@@ -128,114 +130,5 @@ function Login() {
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: "#0f0f23",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "24px",
-  },
-  card: {
-    backgroundColor: "#1a1a2e",
-    borderRadius: "16px",
-    padding: "48px 40px",
-    width: "100%",
-    maxWidth: "420px",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-    border: "1px solid #2a2a4a",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "32px",
-  },
-  logo: {
-    color: "#e94560",
-    fontSize: "28px",
-    fontWeight: "bold",
-    margin: "0 0 8px",
-  },
-  title: {
-    color: "white",
-    fontSize: "20px",
-    margin: "0 0 8px",
-  },
-  subtitle: {
-    color: "#a8a8b3",
-    fontSize: "14px",
-    margin: 0,
-  },
-  alert: {
-    backgroundColor: "#4a1a1a",
-    color: "#ff6b6b",
-    padding: "12px 16px",
-    borderRadius: "8px",
-    fontSize: "14px",
-    marginBottom: "16px",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-  },
-  label: {
-    display: "block",
-    color: "#a8a8b3",
-    fontSize: "13px",
-    marginBottom: "8px",
-    fontWeight: "bold",
-  },
-  input: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1px solid #2a2a4a",
-    backgroundColor: "#0f0f23",
-    color: "white",
-    fontSize: "14px",
-    width: "100%",
-    boxSizing: "border-box",
-    outline: "none",
-  },
-  passwordWrapper: {
-    position: "relative",
-  },
-  eyeButton: {
-    position: "absolute",
-    right: "12px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "16px",
-    padding: 0,
-  },
-  button: {
-    backgroundColor: "#e94560",
-    color: "white",
-    padding: "14px",
-    borderRadius: "8px",
-    border: "none",
-    fontSize: "16px",
-    fontWeight: "bold",
-    width: "100%",
-    marginTop: "8px",
-  },
-  errorText: {
-    color: "#e94560",
-    fontSize: "12px",
-    margin: "4px 0 0",
-  },
-  backLink: {
-    color: "#a8a8b3",
-    textDecoration: "none",
-    fontSize: "13px",
-    textAlign: "center",
-    display: "block",
-  },
-};
 
 export default Login;

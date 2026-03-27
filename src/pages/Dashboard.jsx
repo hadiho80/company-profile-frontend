@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import API_URL from "../config";
 import axios from "axios";
+import API_URL from "../config";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ function Dashboard() {
       });
       setContacts(contacts.filter((c) => c.id !== id));
       setDeleteId(null);
-    } catch (error) {
+    } catch {
       alert("Gagal menghapus data");
     }
   };
@@ -68,14 +68,12 @@ function Dashboard() {
     });
   };
 
-  // Filter pencarian
   const filtered = contacts.filter(
     (c) =>
       c.nama.toLowerCase().includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // Hitung pagination
   const totalPages =
     perPage === "all" ? 1 : Math.ceil(filtered.length / perPage);
   const paginated =
@@ -83,63 +81,75 @@ function Dashboard() {
       ? filtered
       : filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
-  // Reset ke halaman 1 saat search atau perPage berubah
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
   };
-
   const handlePerPage = (e) => {
     setPerPage(e.target.value === "all" ? "all" : Number(e.target.value));
     setCurrentPage(1);
   };
 
   return (
-    <div style={styles.page}>
+    <div className="min-h-screen bg-dark-400">
       {/* Navbar */}
-      <nav style={styles.navbar}>
-        <div style={styles.navLeft}>
-          <span style={styles.logo}>MyCompany</span>
-          <span style={styles.navTitle}>Admin Panel</span>
-        </div>
-        <div style={styles.navRight}>
-          <span style={styles.adminName}>
-            👤 {admin.nama || admin.username}
-          </span>
-          <button style={styles.logoutBtn} onClick={handleLogout}>
-            Logout
-          </button>
+      <nav className="sticky top-0 z-50 bg-dark-100 border-b border-gray-800 px-8 py-4">
+        <div className="flex justify-between items-center flex-wrap gap-3">
+          <div className="flex items-center gap-4">
+            <span className="text-xl font-bold text-primary">MyCompany</span>
+            <span className="text-gray-500 text-sm hidden sm:block">
+              Admin Panel
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-400 text-sm hidden sm:block">
+              👤 {admin.nama || admin.username}
+            </span>
+            <button
+              className="border border-primary text-primary px-4 py-2 rounded-lg text-sm hover:bg-primary hover:text-white transition-all duration-200"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Content */}
-      <div style={styles.content}>
-        <div style={styles.pageHeader}>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Page Header */}
+        <div className="flex justify-between items-start flex-wrap gap-4 mb-6">
           <div>
-            <h1 style={styles.title}>Data Pesan Masuk</h1>
-            <p style={styles.subtitle}>
+            <h1 className="text-3xl font-bold text-primary mb-1">
+              Data Pesan Masuk
+            </h1>
+            <p className="text-gray-500 text-sm">
               Menampilkan {paginated.length} dari {filtered.length} pesan
             </p>
           </div>
-          <button style={styles.refreshBtn} onClick={fetchContacts}>
+          <button
+            className="border border-primary text-primary px-4 py-2 rounded-lg text-sm hover:bg-primary hover:text-white transition-all duration-200"
+            onClick={fetchContacts}
+          >
             🔄 Refresh
           </button>
         </div>
 
         {/* Toolbar */}
-        <div style={styles.toolbar}>
+        <div className="flex flex-wrap gap-4 items-center mb-6">
           <input
-            style={styles.search}
+            className="input-field flex-1 min-w-[200px] max-w-sm"
             type="text"
             placeholder="🔍 Cari nama atau email..."
             value={search}
             onChange={handleSearch}
           />
-
-          <div style={styles.perPageWrapper}>
-            <label style={styles.perPageLabel}>Tampilkan:</label>
+          <div className="flex items-center gap-3">
+            <label className="text-gray-400 text-sm whitespace-nowrap">
+              Tampilkan:
+            </label>
             <select
-              style={styles.select}
+              className="input-field w-auto cursor-pointer"
               value={perPage === "all" ? "all" : perPage}
               onChange={handlePerPage}
             >
@@ -151,22 +161,44 @@ function Dashboard() {
           </div>
         </div>
 
-        {loading && <p style={styles.info}>⏳ Memuat data...</p>}
-        {error && <p style={styles.errorText}>❌ {error}</p>}
+        {/* States */}
+        {loading && (
+          <div className="text-center py-20 text-gray-500">
+            ⏳ Memuat data...
+          </div>
+        )}
+        {error && (
+          <div className="text-center py-20 text-primary">❌ {error}</div>
+        )}
 
+        {/* Table */}
         {!loading && !error && (
           <>
-            <div style={styles.tableWrapper}>
-              <table style={styles.table}>
+            <div className="overflow-x-auto rounded-xl shadow-lg border border-gray-800 mb-6">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr>
-                    <th style={styles.th}>No</th>
-                    <th style={styles.th}>Nama</th>
-                    <th style={styles.th}>Email</th>
-                    <th style={styles.th}>Telepon</th>
-                    <th style={styles.th}>Pesan</th>
-                    <th style={styles.th}>Tanggal</th>
-                    <th style={styles.th}>Aksi</th>
+                  <tr className="bg-dark-300">
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      No
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      Nama
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      Email
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      Telepon
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold">
+                      Pesan
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      Tanggal
+                    </th>
+                    <th className="px-4 py-4 text-left text-primary font-bold whitespace-nowrap">
+                      Aksi
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -174,11 +206,7 @@ function Dashboard() {
                     <tr>
                       <td
                         colSpan="7"
-                        style={{
-                          ...styles.td,
-                          textAlign: "center",
-                          color: "#a8a8b3",
-                        }}
+                        className="px-4 py-16 text-center text-gray-500"
                       >
                         📭 Tidak ada data ditemukan
                       </td>
@@ -187,28 +215,31 @@ function Dashboard() {
                     paginated.map((contact, index) => (
                       <tr
                         key={contact.id}
-                        style={{
-                          backgroundColor:
-                            index % 2 === 0 ? "#16213e" : "#1a2550",
-                        }}
+                        className={`border-t border-gray-800 hover:bg-dark-300 transition-colors ${index % 2 === 0 ? "bg-dark-200" : "bg-dark-100"}`}
                       >
-                        <td style={styles.td}>
+                        <td className="px-4 py-3 text-gray-400">
                           {perPage === "all"
                             ? index + 1
                             : (currentPage - 1) * perPage + index + 1}
                         </td>
-                        <td style={styles.td}>{contact.nama}</td>
-                        <td style={styles.td}>{contact.email}</td>
-                        <td style={styles.td}>{contact.telepon || "-"}</td>
-                        <td style={{ ...styles.td, maxWidth: "220px" }}>
-                          <p style={styles.pesanText}>{contact.pesan}</p>
+                        <td className="px-4 py-3 text-white font-medium">
+                          {contact.nama}
                         </td>
-                        <td style={{ ...styles.td, whiteSpace: "nowrap" }}>
+                        <td className="px-4 py-3 text-gray-300">
+                          {contact.email}
+                        </td>
+                        <td className="px-4 py-3 text-gray-300">
+                          {contact.telepon || "-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-300 max-w-xs">
+                          <p className="line-clamp-2">{contact.pesan}</p>
+                        </td>
+                        <td className="px-4 py-3 text-gray-400 whitespace-nowrap">
                           {formatDate(contact.created_at)}
                         </td>
-                        <td style={styles.td}>
+                        <td className="px-4 py-3">
                           <button
-                            style={styles.deleteBtn}
+                            className="bg-red-900/40 text-red-400 border border-red-800 px-3 py-1.5 rounded-lg text-xs hover:bg-red-800 hover:text-white transition-all duration-200 whitespace-nowrap"
                             onClick={() => setDeleteId(contact.id)}
                           >
                             🗑️ Hapus
@@ -223,13 +254,9 @@ function Dashboard() {
 
             {/* Pagination */}
             {perPage !== "all" && totalPages > 1 && (
-              <div style={styles.pagination}>
+              <div className="flex justify-center items-center gap-2 flex-wrap">
                 <button
-                  style={{
-                    ...styles.pageBtn,
-                    opacity: currentPage === 1 ? 0.4 : 1,
-                    cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                  }}
+                  className="px-4 py-2 rounded-lg bg-dark-300 text-gray-400 text-sm hover:bg-dark-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
@@ -240,12 +267,7 @@ function Dashboard() {
                   (page) => (
                     <button
                       key={page}
-                      style={{
-                        ...styles.pageBtn,
-                        backgroundColor:
-                          page === currentPage ? "#e94560" : "#0f3460",
-                        fontWeight: page === currentPage ? "bold" : "normal",
-                      }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${page === currentPage ? "bg-primary text-white" : "bg-dark-300 text-gray-400 hover:bg-dark-200"}`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
@@ -254,12 +276,7 @@ function Dashboard() {
                 )}
 
                 <button
-                  style={{
-                    ...styles.pageBtn,
-                    opacity: currentPage === totalPages ? 0.4 : 1,
-                    cursor:
-                      currentPage === totalPages ? "not-allowed" : "pointer",
-                  }}
+                  className="px-4 py-2 rounded-lg bg-dark-300 text-gray-400 text-sm hover:bg-dark-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
@@ -273,24 +290,26 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Modal Konfirmasi Hapus */}
+      {/* Modal Hapus */}
       {deleteId && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <h3 style={styles.modalTitle}>⚠️ Konfirmasi Hapus</h3>
-            <p style={styles.modalText}>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-6">
+          <div className="bg-dark-100 rounded-2xl p-8 max-w-md w-full border border-gray-800 shadow-2xl">
+            <h3 className="text-xl font-bold text-primary mb-3">
+              ⚠️ Konfirmasi Hapus
+            </h3>
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">
               Yakin ingin menghapus data ini? Tindakan ini tidak bisa
               dibatalkan.
             </p>
-            <div style={styles.modalButtons}>
+            <div className="flex gap-3 justify-end">
               <button
-                style={styles.cancelBtn}
+                className="px-5 py-2.5 rounded-lg border border-gray-600 text-gray-400 text-sm hover:border-gray-400 transition-colors"
                 onClick={() => setDeleteId(null)}
               >
                 Batal
               </button>
               <button
-                style={styles.confirmBtn}
+                className="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-opacity-90 transition-colors"
                 onClick={() => handleDelete(deleteId)}
               >
                 Ya, Hapus
@@ -302,195 +321,5 @@ function Dashboard() {
     </div>
   );
 }
-
-const styles = {
-  page: { minHeight: "100vh", backgroundColor: "#0f0f23", color: "white" },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "16px 32px",
-    backgroundColor: "#1a1a2e",
-    borderBottom: "1px solid #2a2a4a",
-    flexWrap: "wrap",
-    gap: "12px",
-    position: "sticky",
-    top: 0,
-    zIndex: 999,
-  },
-  navLeft: { display: "flex", alignItems: "center", gap: "16px" },
-  logo: { color: "#e94560", fontSize: "20px", fontWeight: "bold" },
-  navTitle: { color: "#a8a8b3", fontSize: "14px" },
-  navRight: { display: "flex", alignItems: "center", gap: "16px" },
-  adminName: { color: "#a8a8b3", fontSize: "14px" },
-  logoutBtn: {
-    backgroundColor: "transparent",
-    border: "1px solid #e94560",
-    color: "#e94560",
-    padding: "8px 16px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  content: { padding: "32px", maxWidth: "1200px", margin: "0 auto" },
-  pageHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "24px",
-    flexWrap: "wrap",
-    gap: "16px",
-  },
-  title: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    color: "#e94560",
-    margin: "0 0 4px",
-  },
-  subtitle: { color: "#a8a8b3", fontSize: "14px", margin: 0 },
-  refreshBtn: {
-    backgroundColor: "#0f3460",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "8px",
-    border: "1px solid #e94560",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  toolbar: {
-    display: "flex",
-    gap: "16px",
-    alignItems: "center",
-    flexWrap: "wrap",
-    marginBottom: "24px",
-  },
-  search: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1px solid #2a2a4a",
-    backgroundColor: "#1a1a2e",
-    color: "white",
-    fontSize: "14px",
-    flex: "1 1 250px",
-    maxWidth: "400px",
-    boxSizing: "border-box",
-  },
-  perPageWrapper: { display: "flex", alignItems: "center", gap: "10px" },
-  perPageLabel: { color: "#a8a8b3", fontSize: "14px", whiteSpace: "nowrap" },
-  select: {
-    padding: "10px 14px",
-    borderRadius: "8px",
-    border: "1px solid #2a2a4a",
-    backgroundColor: "#1a1a2e",
-    color: "white",
-    fontSize: "14px",
-    cursor: "pointer",
-  },
-  tableWrapper: {
-    overflowX: "auto",
-    borderRadius: "12px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-    marginBottom: "24px",
-  },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: "14px" },
-  th: {
-    backgroundColor: "#0f3460",
-    color: "#e94560",
-    padding: "14px 16px",
-    textAlign: "left",
-    fontWeight: "bold",
-    whiteSpace: "nowrap",
-  },
-  td: {
-    padding: "12px 16px",
-    color: "#d0d0d0",
-    borderBottom: "1px solid #0f3460",
-    verticalAlign: "top",
-  },
-  pesanText: {
-    margin: 0,
-    overflow: "hidden",
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    maxWidth: "220px",
-  },
-  deleteBtn: {
-    backgroundColor: "#4a1a1a",
-    color: "#ff6b6b",
-    border: "1px solid #e94560",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "12px",
-    whiteSpace: "nowrap",
-  },
-  pagination: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "8px",
-    flexWrap: "wrap",
-    marginTop: "8px",
-  },
-  pageBtn: {
-    backgroundColor: "#0f3460",
-    color: "white",
-    border: "1px solid #2a2a4a",
-    padding: "8px 14px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  info: { color: "#a8a8b3", textAlign: "center", marginTop: "40px" },
-  errorText: { color: "#e94560", textAlign: "center", marginTop: "40px" },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 9999,
-  },
-  modal: {
-    backgroundColor: "#1a1a2e",
-    borderRadius: "16px",
-    padding: "32px",
-    maxWidth: "400px",
-    width: "90%",
-    border: "1px solid #2a2a4a",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-  },
-  modalTitle: { color: "#e94560", fontSize: "20px", margin: "0 0 12px" },
-  modalText: {
-    color: "#a8a8b3",
-    fontSize: "14px",
-    lineHeight: "1.6",
-    margin: "0 0 24px",
-  },
-  modalButtons: { display: "flex", gap: "12px", justifyContent: "flex-end" },
-  cancelBtn: {
-    backgroundColor: "transparent",
-    border: "1px solid #a8a8b3",
-    color: "#a8a8b3",
-    padding: "10px 20px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  confirmBtn: {
-    backgroundColor: "#e94560",
-    border: "none",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: "bold",
-  },
-};
 
 export default Dashboard;

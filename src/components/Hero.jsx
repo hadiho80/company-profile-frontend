@@ -1,58 +1,30 @@
 function Hero() {
   return (
-    <section style={styles.section}>
-      <h1 style={styles.title}>Selamat Datang di MyCompany</h1>
-      <p style={styles.subtitle}>
-        Kami hadir untuk memberikan solusi terbaik bagi bisnis Anda
+    <section className="min-h-screen bg-dark-200 flex flex-col items-center justify-center text-center px-6">
+      <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-4">
+        Selamat Datang
       </p>
-      <a href="#contact" style={styles.button}>
-        Hubungi Kami
-      </a>
-
-      <style>{`
-        @media (max-width: 600px) {
-          .hero-title { font-size: 28px !important; }
-          .hero-subtitle { font-size: 16px !important; }
-          .hero-section { padding: 0 16px !important; }
-        }
-      `}</style>
+      <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+        Solusi Digital untuk <br />
+        <span className="text-primary">Bisnis Anda</span>
+      </h1>
+      <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+        Kami hadir untuk memberikan layanan web development, mobile app, dan
+        digital marketing terbaik bagi bisnis Anda.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <a href="#services" className="btn-primary">
+          Lihat Layanan
+        </a>
+        <a
+          href="#contact"
+          className="px-8 py-3 rounded-lg border border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all duration-300"
+        >
+          Hubungi Kami
+        </a>
+      </div>
     </section>
   );
 }
-
-const styles = {
-  section: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "90vh",
-    backgroundColor: "#16213e",
-    color: "white",
-    textAlign: "center",
-    padding: "40px 20px",
-  },
-  title: {
-    fontSize: "clamp(28px, 5vw, 48px)",
-    fontWeight: "bold",
-    marginBottom: "16px",
-    color: "#e94560",
-  },
-  subtitle: {
-    fontSize: "clamp(16px, 2.5vw, 20px)",
-    marginBottom: "32px",
-    color: "#a8a8b3",
-    maxWidth: "600px",
-  },
-  button: {
-    backgroundColor: "#e94560",
-    color: "white",
-    padding: "14px 32px",
-    borderRadius: "8px",
-    textDecoration: "none",
-    fontSize: "16px",
-    fontWeight: "bold",
-  },
-};
 
 export default Hero;

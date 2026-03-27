@@ -1,6 +1,6 @@
 import { useState } from "react";
-import API_URL from "../config";
 import axios from "axios";
+import API_URL from "../config";
 
 function Contact() {
   const [form, setForm] = useState({
@@ -20,48 +20,34 @@ function Contact() {
 
   const validate = () => {
     const newErrors = {};
-
-    if (!form.nama.trim()) {
-      newErrors.nama = "Nama wajib diisi";
-    } else if (form.nama.trim().length < 3) {
+    if (!form.nama.trim()) newErrors.nama = "Nama wajib diisi";
+    else if (form.nama.trim().length < 3)
       newErrors.nama = "Nama minimal 3 karakter";
-    }
-
-    if (!form.email.trim()) {
-      newErrors.email = "Email wajib diisi";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (!form.email.trim()) newErrors.email = "Email wajib diisi";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       newErrors.email = "Format email tidak valid";
-    }
-
-    if (form.telepon && !/^[0-9+\-\s]{8,15}$/.test(form.telepon)) {
+    if (form.telepon && !/^[0-9+\-\s]{8,15}$/.test(form.telepon))
       newErrors.telepon = "Format telepon tidak valid";
-    }
-
-    if (!form.pesan.trim()) {
-      newErrors.pesan = "Pesan wajib diisi";
-    } else if (form.pesan.trim().length < 10) {
+    if (!form.pesan.trim()) newErrors.pesan = "Pesan wajib diisi";
+    else if (form.pesan.trim().length < 10)
       newErrors.pesan = "Pesan minimal 10 karakter";
-    }
-
     return newErrors;
   };
 
   const handleSubmit = async () => {
     setStatus(null);
     const newErrors = validate();
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     setLoading(true);
     try {
       await axios.post(`${API_URL}/api/contacts`, form);
       setStatus({ type: "success", message: "✅ Pesan berhasil dikirim!" });
       setForm({ nama: "", email: "", telepon: "", pesan: "" });
       setErrors({});
-    } catch (error) {
+    } catch {
       setStatus({
         type: "error",
         message: "❌ Gagal mengirim pesan, coba lagi.",
@@ -70,224 +56,114 @@ function Contact() {
     setLoading(false);
   };
 
+  const contactInfo = [
+    {
+      icon: "📍",
+      title: "Alamat",
+      value: "Jl. Contoh No. 123, Jakarta, Indonesia",
+    },
+    { icon: "📞", title: "Telepon", value: "+62 812 3456 7890" },
+    { icon: "✉️", title: "Email", value: "info@mycompany.com" },
+  ];
+
   return (
-    <section id="contact" style={styles.section}>
-      <h2 style={styles.title}>Hubungi Kami</h2>
-      <div style={styles.container}>
-        <div style={styles.info}>
-          <div style={styles.infoItem}>
-            <span style={styles.icon}>📍</span>
-            <div>
-              <h4 style={styles.infoTitle}>Alamat</h4>
-              <p style={styles.infoText}>
-                Jl. Contoh No. 123, Jakarta, Indonesia
-              </p>
-            </div>
-          </div>
-          <div style={styles.infoItem}>
-            <span style={styles.icon}>📞</span>
-            <div>
-              <h4 style={styles.infoTitle}>Telepon</h4>
-              <p style={styles.infoText}>+62 812 3456 7890</p>
-            </div>
-          </div>
-          <div style={styles.infoItem}>
-            <span style={styles.icon}>✉️</span>
-            <div>
-              <h4 style={styles.infoTitle}>Email</h4>
-              <p style={styles.infoText}>info@mycompany.com</p>
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.form}>
-          {status && (
-            <div
-              style={{
-                ...styles.alert,
-                backgroundColor:
-                  status.type === "success" ? "#1a472a" : "#4a1a1a",
-              }}
-            >
-              {status.message}
-            </div>
-          )}
-
-          <div>
-            <input
-              style={{
-                ...styles.input,
-                borderColor: errors.nama ? "#e94560" : "#a8a8b3",
-              }}
-              type="text"
-              name="nama"
-              placeholder="Nama Anda"
-              value={form.nama}
-              onChange={handleChange}
-            />
-            {errors.nama && <p style={styles.errorText}>⚠️ {errors.nama}</p>}
+    <section id="contact" className="py-24 bg-dark-300 px-6">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="section-title">Hubungi Kami</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Info */}
+          <div className="flex flex-col gap-8 justify-center">
+            {contactInfo.map((info, i) => (
+              <div key={i} className="flex items-start gap-4">
+                <span className="text-3xl">{info.icon}</span>
+                <div>
+                  <h4 className="text-primary font-semibold mb-1">
+                    {info.title}
+                  </h4>
+                  <p className="text-gray-400">{info.value}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div>
-            <input
-              style={{
-                ...styles.input,
-                borderColor: errors.email ? "#e94560" : "#a8a8b3",
-              }}
-              type="email"
-              name="email"
-              placeholder="Email Anda"
-              value={form.email}
-              onChange={handleChange}
-            />
-            {errors.email && <p style={styles.errorText}>⚠️ {errors.email}</p>}
-          </div>
-
-          <div>
-            <input
-              style={{
-                ...styles.input,
-                borderColor: errors.telepon ? "#e94560" : "#a8a8b3",
-              }}
-              type="text"
-              name="telepon"
-              placeholder="Telepon Anda (opsional)"
-              value={form.telepon}
-              onChange={handleChange}
-            />
-            {errors.telepon && (
-              <p style={styles.errorText}>⚠️ {errors.telepon}</p>
+          {/* Form */}
+          <div className="flex flex-col gap-4">
+            {status && (
+              <div
+                className={`p-4 rounded-lg text-center text-sm font-medium ${status.type === "success" ? "bg-green-900/50 text-green-400 border border-green-700" : "bg-red-900/50 text-red-400 border border-red-700"}`}
+              >
+                {status.message}
+              </div>
             )}
-          </div>
 
-          <div>
-            <textarea
-              style={{
-                ...styles.textarea,
-                borderColor: errors.pesan ? "#e94560" : "#a8a8b3",
-              }}
-              name="pesan"
-              placeholder="Pesan Anda"
-              rows="5"
-              value={form.pesan}
-              onChange={handleChange}
-            />
-            {errors.pesan && <p style={styles.errorText}>⚠️ {errors.pesan}</p>}
-          </div>
+            <div>
+              <input
+                className={`input-field ${errors.nama ? "border-primary" : ""}`}
+                type="text"
+                name="nama"
+                placeholder="Nama Anda"
+                value={form.nama}
+                onChange={handleChange}
+              />
+              {errors.nama && (
+                <p className="text-primary text-xs mt-1">⚠️ {errors.nama}</p>
+              )}
+            </div>
 
-          <button
-            style={{
-              ...styles.button,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Mengirim..." : "Kirim Pesan"}
-          </button>
+            <div>
+              <input
+                className={`input-field ${errors.email ? "border-primary" : ""}`}
+                type="email"
+                name="email"
+                placeholder="Email Anda"
+                value={form.email}
+                onChange={handleChange}
+              />
+              {errors.email && (
+                <p className="text-primary text-xs mt-1">⚠️ {errors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                className={`input-field ${errors.telepon ? "border-primary" : ""}`}
+                type="text"
+                name="telepon"
+                placeholder="Telepon Anda (opsional)"
+                value={form.telepon}
+                onChange={handleChange}
+              />
+              {errors.telepon && (
+                <p className="text-primary text-xs mt-1">⚠️ {errors.telepon}</p>
+              )}
+            </div>
+
+            <div>
+              <textarea
+                className={`input-field resize-none ${errors.pesan ? "border-primary" : ""}`}
+                name="pesan"
+                placeholder="Pesan Anda"
+                rows="5"
+                value={form.pesan}
+                onChange={handleChange}
+              />
+              {errors.pesan && (
+                <p className="text-primary text-xs mt-1">⚠️ {errors.pesan}</p>
+              )}
+            </div>
+
+            <button
+              className={`btn-primary w-full ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "⏳ Mengirim..." : "Kirim Pesan"}
+            </button>
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-const styles = {
-  section: {
-    padding: "80px 24px",
-    backgroundColor: "#0f3460",
-    color: "white",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: "clamp(28px, 4vw, 36px)",
-    fontWeight: "bold",
-    marginBottom: "48px",
-    color: "#e94560",
-  },
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "48px",
-    flexWrap: "wrap",
-    textAlign: "left",
-    maxWidth: "900px",
-    margin: "0 auto",
-  },
-  info: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "32px",
-    flex: "1 1 250px",
-  },
-  infoItem: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "16px",
-  },
-  icon: {
-    fontSize: "28px",
-  },
-  infoTitle: {
-    margin: "0 0 4px",
-    fontSize: "16px",
-    color: "#e94560",
-  },
-  infoText: {
-    margin: 0,
-    color: "#a8a8b3",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    flex: "1 1 300px",
-    width: "100%",
-    maxWidth: "400px",
-  },
-  alert: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    color: "white",
-    fontSize: "14px",
-    textAlign: "center",
-  },
-  input: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1px solid #a8a8b3",
-    backgroundColor: "#16213e",
-    color: "white",
-    fontSize: "14px",
-    width: "100%",
-    boxSizing: "border-box",
-  },
-  textarea: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1px solid #a8a8b3",
-    backgroundColor: "#16213e",
-    color: "white",
-    fontSize: "14px",
-    resize: "vertical",
-    width: "100%",
-    boxSizing: "border-box",
-  },
-  button: {
-    backgroundColor: "#e94560",
-    color: "white",
-    padding: "14px",
-    borderRadius: "8px",
-    border: "none",
-    fontSize: "16px",
-    fontWeight: "bold",
-    width: "100%",
-  },
-  errorText: {
-    color: "#e94560",
-    fontSize: "12px",
-    margin: "4px 0 0",
-  },
-};
 
 export default Contact;

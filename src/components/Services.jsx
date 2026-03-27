@@ -4,83 +4,64 @@ const serviceList = [
     title: "Web Development",
     description:
       "Kami membangun website modern, responsif, dan cepat sesuai kebutuhan bisnis Anda.",
+    tags: ["React", "Node.js", "MySQL"],
   },
   {
     icon: "📱",
     title: "Mobile App",
     description:
       "Aplikasi mobile iOS dan Android yang intuitif dan mudah digunakan.",
+    tags: ["React Native", "Flutter"],
   },
   {
     icon: "🎨",
     title: "UI/UX Design",
     description:
       "Desain tampilan yang menarik dan pengalaman pengguna yang menyenangkan.",
+    tags: ["Figma", "Prototype"],
   },
   {
     icon: "📈",
     title: "Digital Marketing",
     description:
       "Strategi pemasaran digital untuk meningkatkan brand awareness dan penjualan.",
+    tags: ["SEO", "Social Media", "Ads"],
   },
 ];
 
 function Services() {
   return (
-    <section id="services" style={styles.section}>
-      <h2 style={styles.title}>Layanan Kami</h2>
-      <div style={styles.container}>
-        {serviceList.map((service, index) => (
-          <div key={index} style={styles.card}>
-            <span style={styles.icon}>{service.icon}</span>
-            <h3 style={styles.cardTitle}>{service.title}</h3>
-            <p style={styles.cardText}>{service.description}</p>
-          </div>
-        ))}
+    <section id="services" className="py-24 bg-dark-200 px-6">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="section-title">Layanan Kami</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {serviceList.map((service, index) => (
+            <div key={index} className="card text-center group">
+              <span className="text-5xl block mb-4 group-hover:scale-110 transition-transform duration-300">
+                {service.icon}
+              </span>
+              <h3 className="text-lg font-bold text-white mb-3">
+                {service.title}
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                {service.description}
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {service.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="text-xs bg-dark-300 text-primary px-2 py-1 rounded-full border border-primary/30"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
-
-const styles = {
-  section: {
-    padding: "80px 24px",
-    backgroundColor: "#16213e",
-    color: "white",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: "clamp(28px, 4vw, 36px)",
-    fontWeight: "bold",
-    marginBottom: "48px",
-    color: "#e94560",
-  },
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "24px",
-    flexWrap: "wrap",
-  },
-  card: {
-    backgroundColor: "#0f3460",
-    borderRadius: "12px",
-    padding: "32px 24px",
-    flex: "1 1 200px",
-    maxWidth: "260px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-  },
-  icon: {
-    fontSize: "40px",
-  },
-  cardTitle: {
-    fontSize: "20px",
-    fontWeight: "bold",
-    margin: "16px 0 8px",
-  },
-  cardText: {
-    color: "#a8a8b3",
-    lineHeight: "1.6",
-  },
-};
 
 export default Services;
